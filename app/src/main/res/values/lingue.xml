@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?><resources>
 <string-array name="lingue">
     <item>Italiano</item>
-    <item>Inglese</item>
-    <item>Spagnolo</item>
-    <item>Francese</item>
-    <item>Tedesco</item>
-    <item>Rumeno</item>
-    <item>Portuguese</item>
-    <item>Russian</item>
+    <item>English</item>
+    <item>Espa\u00f1ol</item>
+    <item>Fran\u00e7ais</item>
+    <item>Deutsch</item>
+    <item>Rom\u00e2nesc</item>
+    <item>Portugu\u00eas</item>
+    <item>Russkiy</item>
 </string-array>
+
 <string-array name="abbreviazioni">
-<item>ita</item>
-<item>eng</item>
-<item>spa</item>
-<item>fra</item>
-<item>deu</item>
-<item>ro</item>
+    <item>ita</item>
+    <item>eng</item>
+    <item>spa</item>
+    <item>fra</item>
+    <item>deu</item>
+    <item>ro</item>
     <item>pt</item>
     <item>ru</item>
 
 </string-array>
 <string-array name="intestazioni">
-<item> Scrivi una parola</item>
-<item> Type a word</item>
-<item>Escriba una palabra</item>
-<item>\u00C9crivez un mot</item>
-<item> Geben Sie en Wort</item>
-<item>Scrie un cuv\u00E2nt</item>
-<item>Escreva uma palavra</item>
+    <item> Scrivi una parola</item>
+    <item>Type a word</item>
+    <item>Escriba una palabra</item>
+    <item>\u00C9crivez un mot</item>
+    <item>Geben Sie en Wort</item>
+    <item>Scrie un cuv\u00E2nt</item>
+    <item>Escreva uma palavra</item>
     <item>Napisat\u00E2n slovo</item>
 </string-array>
 </resources>

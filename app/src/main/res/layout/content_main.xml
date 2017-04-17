@@ -22,9 +22,7 @@
                 android:id="@+id/etext"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:autoText="false"
-                android:hint="Parola da tradurre"
+                android:hint="Word To Translate"
                 android:layout_gravity="center"
                 />
             <Button
@@ -45,24 +43,24 @@
             <Spinner
                 android:layout_width="105dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/da"></Spinner>
+                android:id="@+id/langFrom"></Spinner>
             <ImageView
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:background="@drawable/scambio"
-                android:id="@+id/scambio"
-                android:onClick="scambialingua"/>
+                android:id="@+id/exchange"
+                android:onClick="exchangeLanguage"/>
             <Spinner
                 android:layout_width="105dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/acosa"></Spinner>
+                android:id="@+id/langTo"></Spinner>
         </LinearLayout>
         <TextView
             android:gravity="center"
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/risultato"
+            android:id="@+id/result"
             android:textSize="20dp"
             android:paddingTop="15dp"
             android:paddingLeft="10dp"
@@ -73,7 +71,7 @@
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/significato"
+            android:id="@+id/meaning"
             android:textSize="20dp"
             android:paddingTop="15dp"
             android:paddingLeft="10dp"

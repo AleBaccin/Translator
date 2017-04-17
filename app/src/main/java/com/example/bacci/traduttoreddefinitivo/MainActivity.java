@@ -3,8 +3,6 @@ package com.example.bacci.traduttoreddefinitivo;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -16,14 +14,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -40,8 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    String valoreprimario; //variabili globali la prima è la parola da cercare e la seconda è il risultato
-    String traduzionesign = "";
+    String valueToTranlate; //Global varaible, the string that will be translated.
+    String translatedValue = ""; //The translated string.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    creaurl();
+                    createUrl();
                 }
 
                 @Override
@@ -61,23 +57,23 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
             };
-            Spinner spinneron = (Spinner) findViewById(R.id.da);
-            spinneron.setOnItemSelectedListener(itemclickListener);
-            spinneron = (Spinner)findViewById(R.id.acosa);
-            spinneron.setOnItemSelectedListener(itemclickListener);
+            Spinner spinnerInitialized = (Spinner) findViewById(R.id.langFrom);
+            spinnerInitialized.setOnItemSelectedListener(itemclickListener);
+            spinnerInitialized = (Spinner)findViewById(R.id.langTo);
+            spinnerInitialized.setOnItemSelectedListener(itemclickListener);
         }catch (Exception e)
         {
 
         }
-        ScriviTesto(); //chiamo scrivo testo e riempispinner nell'oncreate per  riempire gli spinner
-        riempispinner();
-        this.setTitle("Traduttore");
-        Spinner mspinner = (Spinner) findViewById(R.id.da);
+        textWrited();
+        loadSpinner();//Fill the spinners with the languages.
+        this.setTitle("Translator");
+        Spinner mspinner = (Spinner) findViewById(R.id.langFrom);
         mspinner.setOnTouchListener(new View.OnTouchListener() {
             EditText editText = (EditText) findViewById(R.id.etext);
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) { //chiudo la tastiera al tocco dello spinner
+            public boolean onTouch(View v, MotionEvent event) { //When the user touches the spinner the keyboard will close itself
                 InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                 return false;
@@ -92,48 +88,33 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void Clear(View v) { // Clear the editText
+        EditText empty = (EditText) findViewById(R.id.etext);
+        empty.setText("");
     }
-
-    public void Clear(View v) { // pulisco la edittext
-        EditText svuota = (EditText) findViewById(R.id.etext);
-        svuota.setText("");
-    }
-    public void riempispinner()
+    public void loadSpinner()
     {
-        String[] spin = getResources().getStringArray(R.array.lingue); //riempio gli spinner con i valori dell'array xml lingue
-        Spinner spinner = (Spinner) findViewById(R.id.da);
+        String[] spin = getResources().getStringArray(R.array.lingue); // I fill the spinners with the values from the xml array "lingue"(languages).
+        Spinner spinner = (Spinner) findViewById(R.id.langFrom);
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, spin);
         spinner.setAdapter(spinnerArrayAdapter);
-        spinner.setSelection(0,true); //,true per fare animazione
-        spinner = (Spinner) findViewById(R.id.acosa);
+        spinner.setSelection(0,true); //True, to start the animation
+        spinner = (Spinner) findViewById(R.id.langTo);
         spinner.setAdapter(spinnerArrayAdapter);
         spinner.setSelection(1, true);
 
     }
     @Override
-    protected void onPause() { //gestisco il focus
-        EditText svuota = (EditText) findViewById(R.id.etext);
+    protected void onPause() { //Handling the focus
+        EditText empty = (EditText) findViewById(R.id.etext);
         // hide the keyboard in order to avoid getTextBeforeCursor on inactive InputConnection
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        inputMethodManager.hideSoftInputFromWindow(svuota.getWindowToken(), 0);
+        inputMethodManager.hideSoftInputFromWindow(empty.getWindowToken(), 0);
         super.onPause();
-        creaurl();
+        createUrl();
     }
-    public void ScriviTesto() { //con il textwatcher mi cerca la parola mentre la scrivo
+    public void textWrited() { //With the textwatcher the app can look for the word while the user types it in.
         final EditText editText = (EditText) findViewById(R.id.etext);
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -147,41 +128,41 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                creaurl();
+                createUrl();
             }
         };
         editText.addTextChangedListener(textWatcher);
 
     }
-    public void creaurl() {
-        cambiaintestazione();
-        EditText daedit = (EditText) findViewById(R.id.etext);// prendo i valori di settext e spinner
-        valoreprimario = daedit.getText().toString().toLowerCase();
+    public void createUrl() {
+        exchangeHeaders();
+        EditText fromEditText = (EditText) findViewById(R.id.etext);// get the values from the editText and the spinner
+        valueToTranlate = fromEditText.getText().toString().toLowerCase();
         String[] abbr = getResources().getStringArray(R.array.abbreviazioni);
-        Spinner spinner1 = (Spinner) findViewById(R.id.da);
-        Spinner spinner2 = (Spinner) findViewById(R.id.acosa);
+        Spinner spinner1 = (Spinner) findViewById(R.id.langFrom);
+        Spinner spinner2 = (Spinner) findViewById(R.id.langTo);
         int index1 = (spinner1).getSelectedItemPosition();
-        int index2 = (spinner2).getSelectedItemPosition(); //ottengo gli indici per poter ottenere quindi i rispettivi codici delle 2 lingue
-        String linguada = abbr[index1];
-        String linguaa = abbr[index2];
-        String finale = "https://glosbe.com/gapi/translate?from=" + linguada + "&dest=" + linguaa + "&format=json&phrase=" + valoreprimario; //creo l'url per la ricerca
-        finale parolaTradotta = new finale();
-        parolaTradotta.execute(finale); //eseguo
+        int index2 = (spinner2).getSelectedItemPosition(); //get the indexes to get the respective languages codes.
+        String languageFrom = abbr[index1];
+        String languageTo = abbr[index2];
+        String finalUrl = "https://glosbe.com/gapi/translate?from=" + languageFrom + "&dest=" + languageTo + "&format=json&phrase=" + valueToTranlate; //Create the url for the research
+        result translatedWordAndMeaning = new result();
+        translatedWordAndMeaning.execute(finalUrl); //execute
 
-        String parola = "";
-        String signifato = "";
-        if(traduzionesign != "") { //siccome ottengo il significato e la traduzione in un unica stringa separata da / devo fare uno split
-            String[] parts = traduzionesign.split("/");
-            parola = parts[0];
-            signifato = parts[1];
+        String word = "";
+        String meaningS = "";
+        if(translatedValue != "") { //The result is obtained as a string seprated by "/" so I will need to use string.split.
+            String[] resultComponents = translatedValue.split("/");
+            word = resultComponents[0];
+            meaningS = resultComponents[1];
         }
-        TextView traduzione = (TextView)findViewById(R.id.risultato); // riempio le textview
-        traduzione.setText(parola.toUpperCase());
-        TextView significato = (TextView)findViewById(R.id.significato);
-        significato.setText(signifato);
+        TextView translation = (TextView)findViewById(R.id.result); // Fill the textView
+        translation.setText(word.toUpperCase());
+        TextView meaning = (TextView)findViewById(R.id.meaning);
+        meaning.setText(meaningS);
     }
 
-    public class finale extends AsyncTask<String, Integer, String> {
+    public class result extends AsyncTask<String, Integer, String> {
 
         protected void onPreExecute() {
 
@@ -211,17 +192,17 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(String params)
         {
-            String parola = "";
-            String signifato = "";
-            if(traduzionesign != "") {
-                String[] parts = traduzionesign.split("/"); //siccome ottengo il significato e la traduzione in un unica stringa separata da / devo fare uno split
-                parola = parts[0];
-                signifato = parts[1];
+            String word = "";
+            String meaningS = "";
+            if(translatedValue != "") {
+                String[] parts = translatedValue.split("/"); //The result is obtained as a string seprated by "/" so I will need to use string.split
+                word = parts[0];
+                meaningS = parts[1];
             }
-            TextView traduzione = (TextView)findViewById(R.id.risultato);
-            traduzione.setText(parola.toUpperCase());
-            TextView significato = (TextView)findViewById(R.id.significato);
-            significato.setText(signifato);
+            TextView translation = (TextView)findViewById(R.id.result);
+            translation.setText(word.toUpperCase());
+            TextView meaning = (TextView)findViewById(R.id.meaning);
+            meaning.setText(meaningS);
         }
     }
     private String decodeStream(InputStream inputStream)
@@ -242,28 +223,28 @@ public class MainActivity extends AppCompatActivity {
 
             if(result.equals("ok"))
             {
-                JSONArray tuuc = jsonObject.getJSONArray("tuc");
+                JSONArray tuuc = jsonObject.getJSONArray("tuc");    //Manipulating the Json to get the values that are needed
                 try {
-                    traduzionesign = "...";
-                    traduzionesign= tuuc.getJSONObject(0).getJSONObject("phrase").getString("text");
-                    JSONArray dope = tuuc.getJSONObject(0).getJSONArray("meanings");
-                    traduzionesign = traduzionesign +"/" + dope.getJSONObject(0).getString("text");
-                    Html.fromHtml(traduzionesign).toString();
-                    Log.e("e", traduzionesign);
+                    translatedValue = "...";
+                    translatedValue = tuuc.getJSONObject(0).getJSONObject("phrase").getString("text");
+                    JSONArray jsnArr = tuuc.getJSONObject(0).getJSONArray("meanings");
+                    translatedValue = translatedValue +"/" + jsnArr.getJSONObject(0).getString("text");
+                    Html.fromHtml(translatedValue).toString();
+                    Log.e("e", translatedValue);
                 }
                 catch(Exception e)
                 {
-                    Log.e("e", "Non c'è una traduzione per questa parola");
-                    traduzionesign ="";
-                    TextView textView = (TextView)findViewById(R.id.risultato);
-                    textView.setText("Nessuna traduzione");
+                    Log.e("e", "There is no translation for this word");
+                    translatedValue ="";
+                    TextView textView = (TextView)findViewById(R.id.result);
+                    textView.setText("No translation");
                 }
             }
             else {
-                Log.e("e", "Non c'è una traduzione per questa parola");
-                traduzionesign = "";
-                TextView textView = (TextView) findViewById(R.id.risultato);
-                textView.setText("Nessuna traduzione");
+                Log.e("e", "There is no translation for this word");
+                translatedValue = "";
+                TextView textView = (TextView) findViewById(R.id.result);
+                textView.setText("No translation");
             }
         }
         catch(Exception e)
@@ -271,33 +252,33 @@ public class MainActivity extends AppCompatActivity {
             Log.e("e", "Errore");
         }
 
-        return traduzionesign;
+        return translatedValue;
     }
 
-    public void scambialingua(View v)
+    public void exchangeLanguage(View v)
     {
-        RotateAnimation ruota = new RotateAnimation(0,180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f); // animazione
-        ruota.setDuration(300);
-        ruota.setInterpolator(new LinearInterpolator());
-        ImageView ruotaimmagine = (ImageView) findViewById(R.id.scambio);
-        ruotaimmagine.startAnimation(ruota);
+        RotateAnimation rotate = new RotateAnimation(0,180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f); // animazione
+        rotate.setDuration(300);
+        rotate.setInterpolator(new LinearInterpolator());
+        ImageView rotateImage = (ImageView) findViewById(R.id.exchange);
+        rotateImage.startAnimation(rotate);
 
-        Spinner spinner1 = (Spinner) findViewById(R.id.da);
-        Spinner spinner2 = (Spinner) findViewById(R.id.acosa);
+        Spinner spinner1 = (Spinner) findViewById(R.id.langFrom);
+        Spinner spinner2 = (Spinner) findViewById(R.id.langTo);
         int index1 = (spinner1).getSelectedItemPosition();
         int index2 = (spinner2).getSelectedItemPosition();
         String[] spin = getResources().getStringArray(R.array.lingue);
         spinner1.setSelection(index2, true);
-        spinner2.setSelection(index1, true); //scambio i valori degli spinner
+        spinner2.setSelection(index1, true); //Exchange the values in the spinners
     }
-    public void cambiaintestazione()
+    public void exchangeHeaders()
     {
-        EditText dacambiare = (EditText)findViewById(R.id.etext); //cambio l'intestazione in base alla lingua
-        Spinner spinner1 = (Spinner) findViewById(R.id.da);
+        EditText wordToChange = (EditText)findViewById(R.id.etext); //Change the headers regarding to the spinners values
+        Spinner spinner1 = (Spinner) findViewById(R.id.langFrom);
         int index1 = (spinner1).getSelectedItemPosition();
         String[] intest = getResources().getStringArray(R.array.intestazioni);
         String linguada = intest[index1];
-        dacambiare.setHint(linguada);
+        wordToChange.setHint(linguada);
     }
 
 }
